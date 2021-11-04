@@ -31,6 +31,7 @@ J = myRobot.geometricJacobian(5);
 % myRobot.inertiaCoM
 % myRobot.translatedInertia
 % myRobot.partialJacobian
+myRobot.overallInertia
 
 q = [q1; q2; q3];
 dq = [dq1; dq2; dq3];
@@ -48,7 +49,7 @@ ddq = [ddq1; ddq2; ddq3];
 % myRobot.setValues(u)
 
 %assignment 3
-myRobot.TAUi(3, q, dq, ddq)
+myRobot.TAUi(1, q, dq, ddq)
 %% TODO, 
 % - verificare le multiple inverse se fattibili
 %% assignment 1 TODO sistemare overleaf

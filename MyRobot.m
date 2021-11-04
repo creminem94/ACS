@@ -87,14 +87,14 @@ classdef MyRobot < handle
         end
         
         function Ic = inertiaCoM(obj)
-            Ic = zeros(3,3,obj.N);
+            Ic = syms(zeros(3,3,obj.N));
             for i=1:obj.N
                 Ic(:,:,i) = obj.links(i).inertiaCoM;
             end
         end
         
         function It = translatedInertia(obj)
-            It = zeros(3,3,obj.N);
+            It = syms(zeros(3,3,obj.N));
             for i=1:obj.N
                 It(:,:,i) = obj.links(i).translatedInertia;
             end
@@ -171,12 +171,16 @@ classdef MyRobot < handle
         end
         
         function tauI = TAUi(obj, i, q, dq, ddq)
+            syms g real;
+            g0 = [0;0;g];
             tauI = 0;
-            B = obj.overallInertia;
+            B = obj.overallInertia;            
             for j = 1:obj.N
-                tauI = B(i,j)*ddq(j) + obj.CIJ(i, j, q, dq)*dq(j);
+                lj = obj.links(j);
+                Jp = lj.partialJacobian;
+                g = lj.mass*g0'*Jp(1:3, i);
+                tauI = tauI + B(i,j)*ddq(j) + obj.CIJ(i, j, q, dq)*dq(j) + g;
             end
-%            tauI = tauI + g(q); TODO g
         end
         
         function valueVar = setValues(obj, var)
