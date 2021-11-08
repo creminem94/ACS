@@ -6,6 +6,7 @@ classdef MyRobot < handle
         DH
         links
         N %number of joints
+        allT
     end
     
     methods
@@ -13,6 +14,7 @@ classdef MyRobot < handle
             obj.robot = importrobot(urdfFile);
             obj.config = homeConfiguration(obj.robot);
             obj.DH = DH;
+            obj.computeDirectKinematics;
         end
         
         % setters
@@ -41,7 +43,7 @@ classdef MyRobot < handle
             names = obj.config.JointName;
         end
         
-        function Ti = directKinematics(obj)
+        function computeDirectKinematics(obj)
             [rows cols] = size(obj.DH);
             Ti = sym(zeros(4,4,rows));
             for i=1:rows
@@ -62,11 +64,21 @@ classdef MyRobot < handle
                 %threshold = 1e-6;
                 %Ti(i,:,:) = sym_matrix_round_zeros(Ti(i,:,:), threshold);
             end
+            obj.allT = Ti;
+        end
+        
+        function config = inverseKinematics(obj)
+            [config1, config2] = ik;
+            T = obj.allT(:,:,end);
+            Px = T(1,4);
+            Py = T(2,4);
+            Pz = T(3,4);
+            config = subs(config);
+            config = obj.setValues(config);
         end
         
         function T = getTransform(obj, frameIdx)
-            Ti = obj.directKinematics();
-            T = Ti(:,:,frameIdx);
+            T = obj.allT(:,:,frameIdx);
         end
         
         function J = geometricJacobian(obj, frameIdx)
@@ -192,12 +204,20 @@ classdef MyRobot < handle
             valueVar = subs(var);
         end
         
-        function toolboxT(obj)
-            getTransform(obj.robot,obj.config,'ee','base_link')
+        function T = toolboxT(obj)
+            T = getTransform(obj.robot,obj.config,'ee','base_link');
         end
         
-        function toolboxJg(obj)
-            geometricJacobian(obj.robot,obj.config,'ee')
+        function Jg = toolboxJg(obj)
+            Jg = geometricJacobian(obj.robot,obj.config,'ee');
+        end
+        
+        function ik = toolboxIk(obj)
+            tform = obj.toolboxT;
+            ik = inverseKinematics('RigidBodyTree', obj.robot);
+            weights = [0.25 0.25 0.25 1 1 1];
+            [configSoln,solnInfo] = ik('ee', tform, weights, obj.config);
+            ik = [configSoln.JointPosition];
         end
     end
 end
