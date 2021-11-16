@@ -1,8 +1,13 @@
 %%
+clear all;
 syms dB q1 a2 q2 q3 real;
 syms m1 L1 s1 m2 L2 ro ri m3 L3 s3 real;
 syms dq1 dq2 dq3 real;
 syms ddq1 ddq2 ddq3 real;
+
+q = [q1; q2; q3];
+dq = [dq1; dq2; dq3];
+ddq = [ddq1; ddq2; ddq3];
 
 DH = [
     0 -pi/2 dB 0
@@ -11,7 +16,7 @@ DH = [
     0 0 q3-L3/2 0
     0 pi 0 0
     ];
-myRobot = MyRobot('PRP.urdf', DH);
+myRobot = MyRobot('PRP.urdf', DH, q, dq, ddq);
 % myRobot.show;
 % myRobot.details;
 
@@ -23,19 +28,36 @@ links = [
 ];
 
 myRobot.setLinks(links);
-myRobot.setAllConfig([0, 0, 0]);
+%%
+% myRobot.setValues(myRobot.B)
+% myRobot.setValues(myRobot.B_RNE)
+% 
+% myRobot.setValues(myRobot.C*myRobot.dq)
+% myRobot.setValues(myRobot.C_RNE)
 
-T = myRobot.getTransform(5);
-J = myRobot.geometricJacobian(5);
+% myRobot.G_RNE
+% myRobot.G
+% myRobot.setValues(myRobot.G_RNE)  
+% myRobot.setValues(myRobot.G)
+
+% myRobot.setAllConfig([0, pi/3, 0]);
+% myRobot.setValues(myRobot.C)
+% myRobot.setValues(myRobot.B)
+% myRobot.setValues(myRobot.G)
+% 
+% myRobot.setValues(myRobot.TAU)
+% myRobot.setValues(myRobot.TAU_RNE)
+
+% 
+% myRobot.setAllConfig([0, 0, 0]);
+% 
+% T = myRobot.getTransform(5);
+% J = myRobot.geometricJacobian(5);
 
 % myRobot.inertiaCoM
 % myRobot.translatedInertia
 % myRobot.partialJacobian
-myRobot.overallInertia
 
-q = [q1; q2; q3];
-dq = [dq1; dq2; dq3];
-ddq = [ddq1; ddq2; ddq3];
 % 
 % myRobot.setValues(T)
 % myRobot.toolboxT
@@ -50,6 +72,8 @@ ddq = [ddq1; ddq2; ddq3];
 
 %assignment 3
 % myRobot.TAUi(1, q, dq, ddq)
+
+
 %% TODO, 
 % - verificare le multiple inverse se fattibili
 % - sistemare overleaf

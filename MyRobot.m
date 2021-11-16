@@ -7,13 +7,25 @@ classdef MyRobot < handle
         links
         N %number of joints
         allT
+        innerT
+        B
+        C
+        G
+        q
+        dq
+        ddq
+        TAU
+        TAU_RNE
     end
     
     methods
-        function obj = MyRobot(urdfFile, DH)
+        function obj = MyRobot(urdfFile, DH, q, dq, ddq)
             obj.robot = importrobot(urdfFile);
             obj.config = homeConfiguration(obj.robot);
             obj.DH = DH;
+            obj.q = q;
+            obj.dq = dq;
+            obj.ddq = ddq;
             obj.computeDirectKinematics;
         end
         
@@ -33,8 +45,10 @@ classdef MyRobot < handle
             obj.links = links;
             obj.N = length(links);
             for i=1:obj.N
-                obj.links(i).setPosition(i, obj);
+                obj.links(i).setPosition(i, obj, obj.q(i), obj.dq(i), obj.ddq(i));
             end
+            obj.computeLagrangian;
+            obj.computeRNE;
         end
         
         % getters
@@ -46,6 +60,7 @@ classdef MyRobot < handle
         function computeDirectKinematics(obj)
             [rows cols] = size(obj.DH);
             Ti = sym(zeros(4,4,rows));
+            obj.innerT = sym(zeros(4,4,rows));
             for i=1:rows
                 a = obj.DH(i, 1);
                 alpha = obj.DH(i, 2);
@@ -55,7 +70,7 @@ classdef MyRobot < handle
                      sin(theta) cos(theta)*cos(alpha) -cos(theta)*sin(alpha) a*sin(theta)
                      0 sin(alpha) cos(alpha) d
                      0 0 0 1];
-
+                obj.innerT(:,:, i) = T;
                 if i > 1
                     Ti(:,:,i) = Ti(:,:,i-1) * T;
                 else 
@@ -96,6 +111,10 @@ classdef MyRobot < handle
                 end
                 J(:, i) = col;
             end
+        end
+        
+        function j = J(obj)
+            j = geometricJacobian(5);
         end
         
         function Ic = inertiaCoM(obj)
@@ -145,15 +164,16 @@ classdef MyRobot < handle
                 Jp(:,:,i) = obj.links(i).partialJacobian(obj, i);
             end
         end
-        function B = overallInertia(obj)
+        function computeB(obj)
             B = sym(zeros(obj.N,obj.N));
             for i=1:obj.N
                 l = obj.links(i);
                 B = B + l.overallInertia;
             end
+            obj.B = B;
         end
         function k = kineticEnergy(obj, dq)
-            k = 0.5*dq'*obj.overallInertia*dq;
+            k = 0.5*dq'*obj.B*dq;
             k = vpa(k, 4);
         end
         function u = potentialEnergy(obj)
@@ -164,44 +184,67 @@ classdef MyRobot < handle
             u = vpa(u, 4);
         end
         
-        function cijk = CIJK(obj, i, j, k, q)
-            B = obj.overallInertia;
+        function cijk = CIJK(obj, i, j, k)
+            B = obj.B;
             %dBij/dqk
-            dk = diff(B(i,j), q(k));
+            dk = diff(B(i,j), obj.q(k));
             %dBik/dqj
-            dj = diff(B(i,k), q(j));
+            dj = diff(B(i,k), obj.q(j));
             %dBjk/dqi
-            di = diff(B(j,k), q(i));
-            cijk = dk+dj-di;
+            di = diff(B(j,k), obj.q(i));
+            cijk = (dk+dj-di)/2;
         end
         
-        function cij = CIJ(obj, i, j, q, dq)
+        function cij = CIJ(obj, i, j)
             cij = 0;
             for k = i:obj.N
-                cij = cij + obj.CIJK(i,j,k, q)*dq(k);
+                cij = cij + obj.CIJK(i,j,k)*obj.dq(k);
             end
         end
         
-        function tauI = TAUi(obj, i, q, dq, ddq)
+        function computeC(obj)
+            C = sym(zeros(obj.N,obj.N));
+            for i = 1:obj.N
+                for j = 1:obj.N
+                    C(i, j) = obj.CIJ(i, j);
+                end
+            end
+            obj.C = C;
+        end
+        
+        function computeG(obj)
+            G = sym(zeros(obj.N, 1));
             syms g real;
             g0 = [0;0;g];
-            tauI = 0;
-            B = obj.overallInertia;            
-            for j = 1:obj.N
-                lj = obj.links(j);
-                Jp = lj.partialJacobian;
-                g = lj.mass*g0'*Jp(1:3, i);
-                tauI = tauI + B(i,j)*ddq(j) + obj.CIJ(i, j, q, dq)*dq(j) + g;
+            for i = 1:obj.N
+                g = 0;
+                for j = 1:obj.N
+                    lj = obj.links(j);
+                    Jp = lj.partialJacobian;
+                    g = g + lj.mass*g0'*Jp(1:3, i);
+                end
+                G(j) = g;
             end
+            obj.G = -G;
         end
         
-        function valueVar = setValues(obj, var)
+        function computeLagrangian(obj)
+            obj.computeB;
+            obj.computeC;
+            obj.computeG;
+            obj.TAU = obj.B * obj.ddq + obj.C*obj.dq + obj.G;
+        end
+               
+        function valueVar = setValues(obj, var, useJointPosition)
             values_loader;
-            for i = 1:obj.N
-                i_s = num2str(i);
-                eval(strcat('q',i_s, '=obj.config(',i_s,').JointPosition;'));
+            if nargin == 3 && useJointPosition
+                for i = 1:obj.N
+                    i_s = num2str(i);
+                    eval(strcat('q',i_s, '=obj.config(',i_s,').JointPosition;'));
+                end
             end
             valueVar = subs(var);
+            valueVar = vpa(valueVar, 4);
         end
         
         function T = toolboxT(obj)
@@ -218,6 +261,38 @@ classdef MyRobot < handle
             weights = [0.25 0.25 0.25 1 1 1];
             [configSoln,solnInfo] = ik('ee', tform, weights, obj.config);
             ik = [configSoln.JointPosition];
+        end
+        
+        function computeRNE(obj)
+            obj.TAU_RNE = sym(zeros(3, 1));
+            for i = 1:obj.N
+                j = obj.N - i + 1;
+                obj.TAU_RNE(j) = obj.links(j).tauI;
+            end
+        end
+        
+        function G = G_RNE(obj)
+            tau = obj.TAU_RNE;
+            dq1 = 0; dq2 = 0; dq3 = 0; ddq1 = 0; ddq2 = 0; ddq3 = 0;
+            G = subs(tau);
+        end
+        
+        function C = C_RNE(obj)
+            tau = obj.TAU_RNE;
+            ddq1 = 0; ddq2 = 0; ddq3 = 0; g = 0;
+            C = subs(tau);
+        end
+        
+        function B = B_RNE(obj)
+            tau = obj.TAU_RNE;
+            B = sym(zeros(obj.N, obj.N));
+            dq1 = 0; dq2 = 0; dq3 = 0; g = 0;
+            
+            for i = 1:obj.N
+                ddq1 = 0; ddq2 = 0; ddq3 = 0;
+                eval(strcat('ddq',num2str(i), '=1;')); %ddqi = 1;
+                B(1:obj.N, i) = subs(tau);
+            end
         end
     end
 end
