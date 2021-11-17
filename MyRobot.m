@@ -114,7 +114,21 @@ classdef MyRobot < handle
         end
         
         function j = J(obj)
-            j = geometricJacobian(5);
+            j = obj.geometricJacobian(5);
+        end
+        
+        function t = Ta(obj)
+            syms phi theta real;
+            T = [0 -sin(phi) cos(phi)*sin(theta)
+                0 cos(phi) sin(phi)*sin(theta)
+                1 0 cos(theta)];
+            t = [eye(3) zeros(3)
+                  zeros(3) T];
+        end
+        
+        function ja = Ja(obj)
+            Ta = obj.Ta;
+            ja = inv(Ta)*obj.J;
         end
         
         function Ic = inertiaCoM(obj)
@@ -294,6 +308,25 @@ classdef MyRobot < handle
                 B(1:obj.N, i) = subs(tau);
             end
         end
+        
+        %operationalSpace
+        
+        function B = Ba(obj)
+            Ja = obj.Ja;
+            B = pinv(Ja')*obj.B*pinv(Ja);
+        end
+        
+        function C = Ca_xd(obj)
+            Ja = obj.Ja;
+            dJa = diff(Ja);
+            C = pinv(Ja')*obj.C*obj.dq-obj.Ba*dJa*obj.dq;
+        end
+        
+        function G = Ga(obj)
+            G = pinv(obj.Ja')*obj.G;
+        end
+        
+        
     end
 end
 

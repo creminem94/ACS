@@ -28,6 +28,9 @@ links = [
 ];
 
 myRobot.setLinks(links);
+
+he = [0.1 0.1 0.1 0.1 0.1 0.1]';
+
 %%
 % myRobot.setValues(myRobot.B)
 % myRobot.setValues(myRobot.B_RNE)
