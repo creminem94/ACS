@@ -1,13 +1,6 @@
 %%
-clear all;
-syms dB q1 a2 q2 q3 real;
-syms m1 L1 s1 m2 L2 ro ri m3 L3 s3 real;
-syms dq1 dq2 dq3 real;
-syms ddq1 ddq2 ddq3 real;
 
-q = [q1; q2; q3];
-dq = [dq1; dq2; dq3];
-ddq = [ddq1; ddq2; ddq3];
+syms dB a2 q1 q2 q3 m1 L1 s1 m2 L2 ro ri m3 L3 s3 real;
 
 DH = [
     0 -pi/2 dB 0
@@ -16,27 +9,66 @@ DH = [
     0 0 q3-L3/2 0
     0 pi 0 0
     ];
-myRobot = MyRobot('PRP.urdf', DH, q, dq, ddq);
-% myRobot.show;
-% myRobot.details;
-
-
 links = [
     Link("box", m1, s1, s1, L1, [0;0;-L1/2]) 
     Link("cyl", m2, ro, ri, L2, [-L2/2;0;0])
     Link("box", m3, s3, s3, L3, [0;0;-L3/2])
 ];
-
-myRobot.setLinks(links);
-
-he = [0.1 0.1 0.1 0.1 0.1 0.1]';
+myRobot = MyRobot('PRP.urdf', DH, links);
+% myRobot.show;
+% myRobot.details;
 
 %%
-% myRobot.setValues(myRobot.B)
-% myRobot.setValues(myRobot.B_RNE)
+he = [0 0 0 0 0 0]';
+KD = [10.1;5.2;80.3];
+KP = [40.1;40.2;150.3];
+g_q = [0;0;-g*m3];
+% g_q = [0;0;0]; %without gravity compensation it just take a little bit more to reach steady state
+values_loader;
+
+%% simulink trajectory
+
+qi = [0.2 0.1 2.5]';
+qf = [2 3 4]';
+dqi = [0 0 0]';
+dqf = 0;
+dqm = 0.1;
+ddqm = 0.1;
+dddqm = 0.5;
+ti = 0;
+tf = 10;
+alpha = 0.4;
+beta = 0.4;
+Ts = 0.001;
+
+TimeValues = [ti:Ts:tf];
+DimValues = 3;
+
+DataPositions = [];
+DataVelocities = [];
+
+for i=1:DimValues
+    fprintf("\nEvaluating qi=%f,qf=%f\n",qi(i),qf(i));
+    traj = doubleStrajectory(qi(i),qf(i),dqi(i),dqf,dqm,ddqm,dddqm,ti,tf,alpha,beta,Ts);
+
+    DataPositions(i, :) = traj.q;
+    DataVelocities(i, :) = traj.dq;
+end
+
+qd.time=TimeValues;
+qd.signals.values=DataPositions';
+qd.signals.dimensions=DimValues;
+
+dotqd.time=TimeValues;
+dotqd.signals.values=DataVelocities';
+dotqd.signals.dimensions=DimValues;
+
+%%
+myRobot.setValues(myRobot.B)
+myRobot.setValues(myRobot.B_RNE)
 % 
-% myRobot.setValues(myRobot.C*myRobot.dq)
-% myRobot.setValues(myRobot.C_RNE)
+myRobot.setValues(myRobot.C*myRobot.dq)
+myRobot.setValues(myRobot.C_RNE)
 
 % myRobot.G_RNE
 % myRobot.G

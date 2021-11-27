@@ -11,6 +11,8 @@ m3 = 0.1; %arbitrary
 dB = 0.5; %fixed
 a2 = 0.3; %fixed
 g = -9.8; %fixed
+
+
 % fex = 0;
 % fey = 0;
 % fez = 0;

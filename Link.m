@@ -65,7 +65,7 @@ classdef Link < handle
         end
         
         function Jp = partialJacobian(obj)
-            Jp = sym(zeros(6, length(obj.robot.links)));
+            Jp = sym(zeros(6, obj.robot.N));
             for i=1:obj.idx
                 Z = obj.robot.jacobianZ(i);
                 if obj.type == "box"

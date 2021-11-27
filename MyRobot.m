@@ -16,17 +16,23 @@ classdef MyRobot < handle
         ddq
         TAU
         TAU_RNE
+        trajectoryPoint
+        fwdDynDdq
+        J
     end
     
     methods
-        function obj = MyRobot(urdfFile, DH, q, dq, ddq)
+        function obj = MyRobot(urdfFile, DH, links)
             obj.robot = importrobot(urdfFile);
             obj.config = homeConfiguration(obj.robot);
             obj.DH = DH;
-            obj.q = q;
-            obj.dq = dq;
-            obj.ddq = ddq;
+            obj.N = length(links);
+            obj.q = sym('q', [3 1], 'real');
+            obj.dq = sym('dq', [3 1], 'real');
+            obj.ddq = sym('ddq', [3 1], 'real');
             obj.computeDirectKinematics;
+            obj.computeJ;
+            obj.setLinks(links);
         end
         
         % setters
@@ -37,13 +43,12 @@ classdef MyRobot < handle
         
         function setAllConfig(obj,jointValues)
             for i=1:length(jointValues)
-               obj.setSingleConfig(i, jointValues(i)) 
+               obj.setSingleConfig(i, jointValues(i));
             end
         end
         
         function setLinks(obj, links)
             obj.links = links;
-            obj.N = length(links);
             for i=1:obj.N
                 obj.links(i).setPosition(i, obj, obj.q(i), obj.dq(i), obj.ddq(i));
             end
@@ -113,8 +118,8 @@ classdef MyRobot < handle
             end
         end
         
-        function j = J(obj)
-            j = obj.geometricJacobian(5);
+        function computeJ(obj)
+            obj.J = obj.geometricJacobian(5);
         end
         
         function t = Ta(obj)
@@ -247,15 +252,26 @@ classdef MyRobot < handle
             obj.computeC;
             obj.computeG;
             obj.TAU = obj.B * obj.ddq + obj.C*obj.dq + obj.G;
+            
+            
+        end
+        
+        function setTrajectoryPoint(obj, q, dq)
+            obj.trajectoryPoint.q = q;
+            if nargin == 2
+                dq = zeros(obj.N, 1);
+            end
+            
+            obj.trajectoryPoint.dq = dq;
         end
                
-        function valueVar = setValues(obj, var, useJointPosition)
+        function valueVar = setValues(obj, var, useJointPosition, useTrajectoryPoint)
             values_loader;
             if nargin == 3 && useJointPosition
-                for i = 1:obj.N
-                    i_s = num2str(i);
-                    eval(strcat('q',i_s, '=obj.config(',i_s,').JointPosition;'));
-                end
+                var = subs(var, obj.q, [obj.config.JointPosition]');
+            end
+            if nargin == 4 && useTrajectoryPoint
+                var = subs(var, [obj.q; obj.dq], [obj.trajectoryPoint.q; obj.trajectoryPoint.dq]);
             end
             valueVar = subs(var);
             valueVar = vpa(valueVar, 4);
@@ -283,6 +299,10 @@ classdef MyRobot < handle
                 j = obj.N - i + 1;
                 obj.TAU_RNE(j) = obj.links(j).tauI;
             end
+            tau = sym('tau', [obj.N 1]);
+            syms fex fey fez uex uey uez real;
+            he = [fex fey fez uex uey uez]';
+            obj.fwdDynDdq = inv(obj.B_RNE) * (tau - obj.C_RNE - obj.G_RNE - obj.J'*he);
         end
         
         function G = G_RNE(obj)
