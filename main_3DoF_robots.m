@@ -18,18 +18,28 @@ myRobot = MyRobot('PRP.urdf', DH, links);
 % myRobot.show;
 % myRobot.details;
 
-%%
+%% 
+
 he = [0 0 0 0 0 0]';
-KD = [10.1;5.2;80.3];
-KP = [40.1;40.2;150.3];
-g_q = [0;0;-g*m3];
+
+%joint space pd control with gravity compensation
+KD = [10;5;10];
+KP = [50;100;50];
+
 % g_q = [0;0;0]; %without gravity compensation it just take a little bit more to reach steady state
 values_loader;
+g_q = [0;0;-g*m3];
+
+g_q_c = g_q; %[0;0;-g*m3*1.1];
+
+%joint space inv dyn control
+Kd_inv = [10;5;10];
+Kp_inv = [50;100;50];
 
 %% simulink trajectory
 
-qi = [0.2 0.1 2.5]';
-qf = [2 3 4]';
+qi = [0 0 0]';
+qf = [0.1 pi 0.2]';
 dqi = [0 0 0]';
 dqf = 0;
 dqm = 0.1;
@@ -46,6 +56,7 @@ DimValues = 3;
 
 DataPositions = [];
 DataVelocities = [];
+DataAccelerations = [];
 
 for i=1:DimValues
     fprintf("\nEvaluating qi=%f,qf=%f\n",qi(i),qf(i));
@@ -53,15 +64,20 @@ for i=1:DimValues
 
     DataPositions(i, :) = traj.q;
     DataVelocities(i, :) = traj.dq;
+    DataAccelerations(i, :) = traj.ddq;
 end
 
 qd.time=TimeValues;
 qd.signals.values=DataPositions';
 qd.signals.dimensions=DimValues;
 
-dotqd.time=TimeValues;
-dotqd.signals.values=DataVelocities';
-dotqd.signals.dimensions=DimValues;
+dqd.time=TimeValues;
+dqd.signals.values=DataVelocities';
+dqd.signals.dimensions=DimValues;
+
+ddqd.time=TimeValues;
+ddqd.signals.values=DataVelocities';
+ddqd.signals.dimensions=DimValues;
 
 %%
 myRobot.setValues(myRobot.B)
