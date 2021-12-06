@@ -53,10 +53,11 @@ classdef Link < handle
         end
         
         function setPosition(obj, idx, robot, qi, dqi, ddqi)
-            T = robot.getTransform(idx+1);%+1 because we have the base frame
+            T = robot.getTransform(idx+1); %CoM is computed from the end of the link
             R = T(1:3,1:3);
             obj.pli = R*obj.tvec+T(1:3, 4);
-            obj.pj = T(1:3, 4);
+            T2 = robot.getTransform(idx);
+            obj.pj = T2(1:3, 4); %pj-1
             obj.idx = idx;
             obj.robot = robot;
             obj.qi = qi;
@@ -68,10 +69,10 @@ classdef Link < handle
             Jp = sym(zeros(6, obj.robot.N));
             for i=1:obj.idx
                 Z = obj.robot.jacobianZ(i);
-                if obj.type == "box"
+                if obj.robot.links(i).type == "box"
                     col = [Z;0;0;0];
                 else
-                    C = cross(Z, obj.pli-obj.pj);
+                    C = cross(Z, obj.pli-obj.robot.links(i).pj);
                     col = [C;Z];
                 end
                 Jp(:, i) = col;

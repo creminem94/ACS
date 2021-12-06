@@ -10,9 +10,9 @@ DH = [
     0 pi 0 0
     ];
 links = [
-    Link("box", m1, s1, s1, L1, [0;0;-L1/2]) 
+    Link("box", m1, s1, s1, L1, [0;-L1/2;0]) 
     Link("cyl", m2, ro, ri, L2, [-L2/2;0;0])
-    Link("box", m3, s3, s3, L3, [0;0;-L3/2])
+    Link("box", m3, s3, s3, L3, [0;0;L3/2])
 ];
 myRobot = MyRobot('PRP.urdf', DH, links);
 % myRobot.show;
@@ -37,7 +37,7 @@ Kd_inv = [10;5;10];
 Kp_inv = [50;100;50];
 
 %% simulink trajectory
-
+addpath ../../RVC/UR5_matlab/project/trajectories;
 qi = [0 0 0]';
 qf = [0.1 pi 0.2]';
 dqi = [0 0 0]';
@@ -80,11 +80,11 @@ ddqd.signals.values=DataVelocities';
 ddqd.signals.dimensions=DimValues;
 
 %%
-myRobot.setValues(myRobot.B)
-myRobot.setValues(myRobot.B_RNE)
+myRobot.setValues(myRobot.B, true)
+myRobot.setValues(myRobot.B_RNE, true)
 % 
-myRobot.setValues(myRobot.C*myRobot.dq)
-myRobot.setValues(myRobot.C_RNE)
+% myRobot.setValues(myRobot.C*myRobot.dq)
+% myRobot.setValues(myRobot.C_RNE)
 
 % myRobot.G_RNE
 % myRobot.G

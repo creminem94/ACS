@@ -177,12 +177,7 @@ classdef MyRobot < handle
             T2 = obj.getTransform(refIdx);
             P = T2(1:3, 4) - T1(1:3, 4);
         end
-        function Jp = partialJacobian(obj)
-            Jp = sym(zeros(6,obj.N, obj.N));
-            for i=1:obj.N
-                Jp(:,:,i) = obj.links(i).partialJacobian(obj, i);
-            end
-        end
+        
         function computeB(obj)
             B = sym(zeros(obj.N,obj.N));
             for i=1:obj.N
@@ -191,8 +186,8 @@ classdef MyRobot < handle
             end
             obj.B = B;
         end
-        function k = kineticEnergy(obj, dq)
-            k = 0.5*dq'*obj.B*dq;
+        function k = kineticEnergy(obj)
+            k = simplify(0.5*obj.dq'*obj.B*obj.dq);
             k = vpa(k, 4);
         end
         function u = potentialEnergy(obj)
@@ -305,6 +300,13 @@ classdef MyRobot < handle
             obj.fwdDynDdq = inv(obj.B_RNE) * (tau - obj.C_RNE - obj.G_RNE - obj.J'*he);
         end
         
+        function ddq = getFwdDynDdq(obj)
+            syms fex fey fez uex uey uez real;
+            he = [fex fey fez uex uey uez]';
+            tau = sym('tau', [obj.N 1]);
+            ddq = inv(obj.B) * (tau - obj.C*obj.dq - obj.G_RNE - obj.J'*he);
+        end
+        
         function G = G_RNE(obj)
             tau = obj.TAU_RNE;
             dq1 = 0; dq2 = 0; dq3 = 0; ddq1 = 0; ddq2 = 0; ddq3 = 0;
@@ -321,7 +323,8 @@ classdef MyRobot < handle
             tau = obj.TAU_RNE;
             B = sym(zeros(obj.N, obj.N));
             dq1 = 0; dq2 = 0; dq3 = 0; g = 0;
-            
+            fex = 0;fey = 0;fez = 0;
+            uex = 0;uey = 0;uez = 0;
             for i = 1:obj.N
                 ddq1 = 0; ddq2 = 0; ddq3 = 0;
                 eval(strcat('ddq',num2str(i), '=1;')); %ddqi = 1;
