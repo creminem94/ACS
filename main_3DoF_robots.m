@@ -80,14 +80,14 @@ ddqd.signals.values=DataVelocities';
 ddqd.signals.dimensions=DimValues;
 
 %%
-myRobot.setAllConfig([0, pi/3, 0]);
+myRobot.setAllConfig([0, pi/2, 0]);
 
-
+%c'è una differenza quando ho q2 <> 0
 myRobot.setValues(myRobot.B, true)
 myRobot.setValues(myRobot.B_RNE, true)
 
-myRobot.setValues(myRobot.C*myRobot.dq, true)
-myRobot.setValues(myRobot.C_RNE, true)
+myRobot.setValues(myRobot.C*myRobot.dq)
+myRobot.setValues(myRobot.C_RNE)
 
 % myRobot.G_RNE
 % myRobot.G

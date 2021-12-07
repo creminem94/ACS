@@ -49,7 +49,8 @@ classdef Link < handle
         end
         
         function It = translatedInertia(obj)
-           It = obj.inertiaCoM + obj.mass*(obj.tvec'*obj.tvec*eye(3)-obj.tvec*obj.tvec');
+            r = obj.tvec;
+            It = obj.inertiaCoM + obj.mass*(r'*r*eye(3)-r*r');
         end
         
         function setPosition(obj, idx, robot, qi, dqi, ddqi)
@@ -206,7 +207,7 @@ classdef Link < handle
         function u = ui_i(obj)
             R = obj.Ri_ip1;
             I = obj.translatedInertia;
-            u = -cross(obj.fi_i, obj.ri_im1_i+obj.ri_ic_i) + R*obj.uip1_ip1;
+            u = cross(-obj.fi_i, obj.ri_im1_i+obj.ri_ic_i) + R*obj.uip1_ip1;
             u = u + cross(R*obj.fip1_ip1, obj.ri_ic_i) + I*obj.dwi_i;
             u = u + cross(obj.wi_i, I*obj.wi_i);
         end

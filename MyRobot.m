@@ -344,7 +344,6 @@ classdef MyRobot < handle
             G = pinv(obj.Ja')*obj.G;
         end
         
-        
     end
 end
 
