@@ -80,18 +80,21 @@ ddqd.signals.values=DataVelocities';
 ddqd.signals.dimensions=DimValues;
 
 %%
+myRobot.setAllConfig([0, pi/3, 0]);
+
+
 myRobot.setValues(myRobot.B, true)
 myRobot.setValues(myRobot.B_RNE, true)
-% 
-% myRobot.setValues(myRobot.C*myRobot.dq)
-% myRobot.setValues(myRobot.C_RNE)
+
+myRobot.setValues(myRobot.C*myRobot.dq, true)
+myRobot.setValues(myRobot.C_RNE, true)
 
 % myRobot.G_RNE
 % myRobot.G
-% myRobot.setValues(myRobot.G_RNE)  
-% myRobot.setValues(myRobot.G)
+myRobot.setValues(myRobot.G_RNE)  
+myRobot.setValues(myRobot.G)
 
-% myRobot.setAllConfig([0, pi/3, 0]);
+
 % myRobot.setValues(myRobot.C)
 % myRobot.setValues(myRobot.B)
 % myRobot.setValues(myRobot.G)

@@ -248,7 +248,10 @@ classdef MyRobot < handle
             obj.computeG;
             obj.TAU = obj.B * obj.ddq + obj.C*obj.dq + obj.G;
             
-            
+            tau = sym('tau', [obj.N 1]);
+            syms fex fey fez uex uey uez real;
+            he = [fex fey fez uex uey uez]';
+            obj.fwdDynDdq = inv(obj.B) * (tau - obj.C*obj.dq- obj.G- obj.J'*he);
         end
         
         function setTrajectoryPoint(obj, q, dq)
@@ -290,32 +293,24 @@ classdef MyRobot < handle
         
         function computeRNE(obj)
             obj.TAU_RNE = sym(zeros(3, 1));
-            for i = 1:obj.N
-                j = obj.N - i + 1;
-                obj.TAU_RNE(j) = obj.links(j).tauI;
+            for i = obj.N:-1:1
+                obj.TAU_RNE(i) = obj.links(i).tauI;
             end
-            tau = sym('tau', [obj.N 1]);
-            syms fex fey fez uex uey uez real;
-            he = [fex fey fez uex uey uez]';
-            obj.fwdDynDdq = inv(obj.B_RNE) * (tau - obj.C_RNE - obj.G_RNE - obj.J'*he);
-        end
-        
-        function ddq = getFwdDynDdq(obj)
-            syms fex fey fez uex uey uez real;
-            he = [fex fey fez uex uey uez]';
-            tau = sym('tau', [obj.N 1]);
-            ddq = inv(obj.B) * (tau - obj.C*obj.dq - obj.G_RNE - obj.J'*he);
         end
         
         function G = G_RNE(obj)
             tau = obj.TAU_RNE;
             dq1 = 0; dq2 = 0; dq3 = 0; ddq1 = 0; ddq2 = 0; ddq3 = 0;
+            fex = 0;fey = 0;fez = 0;
+            uex = 0;uey = 0;uez = 0;
             G = subs(tau);
         end
         
         function C = C_RNE(obj)
             tau = obj.TAU_RNE;
             ddq1 = 0; ddq2 = 0; ddq3 = 0; g = 0;
+            fex = 0;fey = 0;fez = 0;
+            uex = 0;uey = 0;uez = 0;
             C = subs(tau);
         end
         

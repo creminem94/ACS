@@ -111,12 +111,7 @@ classdef Link < handle
         end
         
         function r = ri_ic_i(obj)
-            l = obj.c_h;
-            if obj.type == "box"
-                r = [0;0;l];
-            else
-                r = [l;0;0];
-            end
+            r = obj.tvec;
         end
         
         function l = prevLink(obj)
@@ -165,7 +160,7 @@ classdef Link < handle
             R = baseT(1:3,1:3);
             
             if obj.idx == 1
-                d = R*[0; 0; g];
+                d = R*[0; 0; g]; %how gravity is oriented on first joint
             else
                 d = obj.prevLink.ddpi_i;
             end
@@ -211,7 +206,7 @@ classdef Link < handle
         function u = ui_i(obj)
             R = obj.Ri_ip1;
             I = obj.translatedInertia;
-            u = cross(-obj.fi_i, obj.ri_im1_i+obj.ri_ic_i) + R*obj.uip1_ip1;
+            u = -cross(obj.fi_i, obj.ri_im1_i+obj.ri_ic_i) + R*obj.uip1_ip1;
             u = u + cross(R*obj.fip1_ip1, obj.ri_ic_i) + I*obj.dwi_i;
             u = u + cross(obj.wi_i, I*obj.wi_i);
         end
