@@ -17,7 +17,6 @@ classdef MyRobot < handle
         TAU
         TAU_RNE
         trajectoryPoint
-        fwdDynDdq
         J
     end
     
@@ -81,8 +80,6 @@ classdef MyRobot < handle
                 else 
                     Ti(:,:,i) = T;
                 end
-                %threshold = 1e-6;
-                %Ti(i,:,:) = sym_matrix_round_zeros(Ti(i,:,:), threshold);
             end
             obj.allT = Ti;
         end
@@ -93,7 +90,7 @@ classdef MyRobot < handle
             Px = T(1,4);
             Py = T(2,4);
             Pz = T(3,4);
-            config = subs(config);
+            config = subs(config1);
             config = obj.setValues(config);
         end
         
@@ -248,10 +245,14 @@ classdef MyRobot < handle
             obj.computeG;
             obj.TAU = obj.B * obj.ddq + obj.C*obj.dq + obj.G;
             
+        end
+        
+        function ddq = fwdDyn(obj) 
             tau = sym('tau', [obj.N 1]);
             syms fex fey fez uex uey uez real;
             he = [fex fey fez uex uey uez]';
-            obj.fwdDynDdq = inv(obj.B) * (tau - obj.C*obj.dq- obj.G- obj.J'*he);
+%             ddq = inv(obj.B) * (tau - obj.C*obj.dq- obj.G- obj.J'*he);
+            ddq = inv(obj.B_RNE) * (tau - obj.C_RNE- obj.G_RNE- obj.J'*he);
         end
         
         function setTrajectoryPoint(obj, q, dq)
