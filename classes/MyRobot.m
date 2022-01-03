@@ -98,6 +98,10 @@ classdef MyRobot < handle
             T = obj.allT(:,:,frameIdx);
         end
         
+        function T = getEeT(obj)
+            T = obj.allT(:,:,end);
+        end
+        
         function J = geometricJacobian(obj, frameIdx)
             totalCols = min([obj.N, frameIdx]);
             J = sym(zeros(6, totalCols));

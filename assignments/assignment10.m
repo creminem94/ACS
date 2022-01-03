@@ -1,7 +1,8 @@
 he = [0 0 0 0 0 0]';
 
-KD = [200;10;10;10;10;10];
+KD = [200;40;10;10;10;10];
 KP = [1000;50;50;50;50;50];
+values_loader;
 g_q = [0;0;-g*m3];
 
 % simulink trajectory
@@ -19,7 +20,7 @@ beta = 0.4;
 Ts = 0.001;
 
 xi = getK(qi);
-xf = getK(qf);
+xf = getK(qf);%[-0.3; 0.55;0.2;0;1.7;0];
 
 TimeValues = [ti:Ts:tf];
 DimValues = 6;
@@ -48,5 +49,5 @@ dxd.signals.dimensions=DimValues;
 ddxd.time=TimeValues;
 ddxd.signals.values=DataVelocities';
 ddxd.signals.dimensions=DimValues;
-open('simulink_models\operational_space_pd_w_g_comp.slx');
-sim('simulink_models\operational_space_pd_w_g_comp.slx');
+open('simulink_models\operational_space_inv_dyn.slx');
+sim('simulink_models\operational_space_inv_dyn.slx');

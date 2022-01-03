@@ -1,7 +1,8 @@
 he = [0 0 0 0 0 0]';
 
-KD = [10;5;10];
-KP = [50;100;50];
+KD = [20;20;20];
+KP = [100;100;100];
+
 
 % simulink trajectory
 qi = [0 0 0]';
@@ -47,3 +48,10 @@ ddqd.signals.dimensions=DimValues;
 
 open('simulink_models\joint_space_inv_dyn.slx');
 sim('simulink_models\joint_space_inv_dyn.slx');
+
+% Stabilized double integrators means second order system: check that
+% having same kp and kd with same step input get same time response
+
+% notes: gravity term error will affect steady state error, coriolis and
+% centrifugal term error will affect transient. Try to remove one of the 2
+% from N to see the effect

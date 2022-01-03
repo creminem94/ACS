@@ -1,9 +1,10 @@
 he = [0 0 0 0 0 0]';
 
 KD = 10;
-KP = 50;
+KP = 100;
 lambda = 1;
-Ktheta = diag([0.1 0.1 0.1]);
+Ktheta = inv(diag([2 3 4]));
+A = 1;
 
 % simulink trajectory
 qi = 0;

@@ -12,6 +12,11 @@ dB = 0.5; %fixed
 a2 = 0.3; %fixed
 g = -9.8; %fixed
 
+%params used for B hat and N hat
+% m1 = 0.45;
+% m2 = 0.3;
+% m3 = 0.15;
+
 % fex = 0;
 % fey = 0;
 % fez = 0;
