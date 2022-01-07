@@ -1,4 +1,6 @@
-addpath methods classes simulink_models ../../RVC/UR5_matlab/project/trajectories;
+clear all;
+close all;
+addpath methods assignments classes simulink_models ../../RVC/UR5_matlab/project/trajectories;
 syms dB a2 q1 q2 q3 m1 L1 s1 m2 L2 ro ri m3 L3 s3 real;
 
 DH = [
@@ -14,3 +16,6 @@ links = [
     Link("box", m3, s3, s3, L3, [0;0;L3/2])
 ];
 myRobot = MyRobot('PRP.urdf', DH, links);
+
+% for visual simulation it needs a variable
+rbt = importrobot('PRP.urdf');

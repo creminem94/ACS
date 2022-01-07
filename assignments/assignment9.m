@@ -8,7 +8,7 @@ g_q = [0;0;-g*m3];
 % simulink trajectory
 qi = [-0.3 -pi -0.2]';
 qf = [0.3 pi 0.2]';
-% dqi = [0 0 0]';
+dqi = [0 0 0]';
 % dqf = 0;
 % dqm = 0.1;
 % ddqm = 0.1;
@@ -26,8 +26,8 @@ for i = 1:length(qTraj(1,:)) %each point in trajectory
     xTraj(:,i) = getK(qTraj(:,i));
 end
 
-% xi = getK(qi);
-% xf = getK(qf);
+xi = getK(qi);
+xf = getK(qf);
 
 TimeValues = [ti:Ts:tf];
 DimValues = 6;
