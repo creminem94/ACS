@@ -1,3 +1,6 @@
+% Assignment 3
+% equations of motion (dynamic model)
+
 disp('B');
 disp(myRobot.B);
 disp('C');

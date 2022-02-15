@@ -253,10 +253,8 @@ classdef MyRobot < handle
         
         function ddq = fwdDyn(obj) 
             tau = sym('tau', [obj.N 1]);
-            syms fex fey fez uex uey uez real;
-            he = [fex fey fez uex uey uez]';
-%             ddq = inv(obj.B) * (tau - obj.C*obj.dq- obj.G- obj.J'*he);
-            ddq = inv(obj.B_RNE) * (tau - obj.C_RNE- obj.G_RNE- obj.J'*he);
+%             ddq = inv(obj.B) * (tau - obj.C*obj.dq- obj.G);
+            ddq = inv(obj.B_RNE) * (tau - obj.C_RNE- obj.G_RNE);
         end
         
         function setTrajectoryPoint(obj, q, dq)

@@ -1,4 +1,4 @@
-function [sys,x0,str,ts] = c(t,x,u,flag,myRobot, he, qi, dqi)
+function [sys,x0,str,ts] = c(t,x,u,flag,myRobot, qi, dqi)
 switch flag,
 
   %%%%%%%%%%%%%%%%%%
@@ -11,7 +11,7 @@ switch flag,
   % Derivatives %
   %%%%%%%%%%%%%%%
   case 1,
-    sys=mdlDerivatives(t,x,u,myRobot,he);
+    sys=mdlDerivatives(t,x,u,myRobot);
 
   %%%%%%%%%%%
   % Outputs %S
@@ -62,7 +62,7 @@ ts  = [0 0];
 % Return the derivatives for the continuous states.
 %=============================================================================
 %
-function sys=mdlDerivatives(t,x,u,myRobot, he)
+function sys=mdlDerivatives(t,x,u,myRobot)
     N = myRobot.N;
     q = x(1:N);
     dq = x(N+1:2*N);
@@ -73,7 +73,7 @@ function sys=mdlDerivatives(t,x,u,myRobot, he)
 %     ddq = subs(ddq, [tauSym; heSym], [tau; he]);
 %     sys = eval([dq; ddq]); %otherwise values are not "real"
   
-    ddq = fwdDyn(q, dq, u, he);
+    ddq = fwdDyn(q, dq, u);
     sys = [dq; ddq];
     
 

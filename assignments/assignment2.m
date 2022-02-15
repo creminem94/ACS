@@ -1,3 +1,7 @@
+% Assignment 2
+% Compute the kinetic energy
+% I Compute the potential energy
+
 disp('Kinetic energy');
 disp(myRobot.kineticEnergy);
 disp('Potential Energy');

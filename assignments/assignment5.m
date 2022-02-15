@@ -1,3 +1,6 @@
+% Assignment 5
+% Compute the dynamic model in the operational space
+
 disp('B op');
 disp(myRobot.Ba);
 disp('C op * xd');

@@ -1,4 +1,5 @@
-he = [0 0 0 0 0 0]';
+% Assignment 9
+% Design the Operational Space PD control law with gravity compensation
 
 KD = [200;10;10;10;10;10];
 KP = [1000;50;50;50;50;50];

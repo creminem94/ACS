@@ -1,3 +1,10 @@
+% Assignment 1
+% DH table
+% direct kinematics
+% inverse kinematics
+% Jacobians (geometric and analytical)
+% By hand, and cross-checking with Robotics toolbox
+
 % myRobot.show;
 disp('DH Table');
 disp(myRobot.DH);

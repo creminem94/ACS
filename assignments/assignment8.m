@@ -1,52 +1,13 @@
-he = [0 0 0 0 0 0]';
+% Assignment 8
+% Implement in Simulink the Adaptive Control law for the a 1-DoF link under gravity
 
-KD = 10;
+KD = 30;
 KP = 100;
-lambda = 1;
-Ktheta = inv(diag([2 3 4]));
+lambda = 10;
+Ktheta = inv(diag([100 100 100]));
 A = 1;
 
-% simulink trajectory
-qi = 0;
-qf = pi/2;
-dqi = 0;
-dqf = 0;
-dqm = 0.1;
-ddqm = 0.1;
-dddqm = 0.5;
-ti = 0;
-tf = 10;
-alpha = 0.4;
-beta = 0.4;
 Ts = 0.001;
-
-TimeValues = [ti:Ts:tf];
-DimValues = 1;
-
-DataPositions = [];
-DataVelocities = [];
-DataAccelerations = [];
-
-for i=1:DimValues
-    fprintf("\nEvaluating qi=%f,qf=%f\n",qi(i),qf(i));
-    traj = doubleStrajectory(qi(i),qf(i),dqi(i),dqf,dqm,ddqm,dddqm,ti,tf,alpha,beta,Ts);
-
-    DataPositions(i, :) = traj.q;
-    DataVelocities(i, :) = traj.dq;
-    DataAccelerations(i, :) = traj.ddq;
-end
-
-qd.time=TimeValues;
-qd.signals.values=DataPositions';
-qd.signals.dimensions=DimValues;
-
-dqd.time=TimeValues;
-dqd.signals.values=DataVelocities';
-dqd.signals.dimensions=DimValues;
-
-ddqd.time=TimeValues;
-ddqd.signals.values=DataVelocities';
-ddqd.signals.dimensions=DimValues;
 
 open('simulink_models\joint_space_adaptive.slx');
 sim('simulink_models\joint_space_adaptive.slx');

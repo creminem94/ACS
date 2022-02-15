@@ -1,12 +1,14 @@
-he = [0 0 0 0 0 0]';
+% Assignment 7
+% Design the Joint Space Inverse Dynamics Control law
 
-KD = [20;20;20];
-KP = [100;100;100];
-
+KD = [20;50;20];
+KP = [80;300;100];
+clear qd
+wrongModel = 0;
 
 % simulink trajectory
 qi = [0 0 0]';
-qf = [0.1 pi 0.2]';
+qf = [0.2 pi 0.2]';
 dqi = [0 0 0]';
 dqf = 0;
 dqm = 0.1;
@@ -49,9 +51,31 @@ ddqd.signals.dimensions=DimValues;
 open('simulink_models\joint_space_inv_dyn.slx');
 sim('simulink_models\joint_space_inv_dyn.slx');
 
-% Stabilized double integrators means second order system: check that
-% having same kp and kd with same step input get same time response
-
 % notes: gravity term error will affect steady state error, coriolis and
 % centrifugal term error will affect transient. Try to remove one of the 2
 % from N to see the effect
+
+% settling time piccolo = alti gain
+
+%%
+% Check that in the nominal case the dynamic behaviour is equivalent to the one of a
+% set of stabilized double integrators
+KD = [20;20;20];
+KP = [100;100;100];
+sim('simulink_models\joint_space_inv_dyn.slx');
+%%
+% Check the behavior of the control law when the ^B; ^C; ^g used within the controller are
+% different than the “true ones” B;C; g (e.g. slightly modify the masses, the frictions, ...)
+KD = [20;20;20];
+KP = [100;100;100];
+wrongModel = 1;
+sim('simulink_models\joint_space_inv_dyn.slx');
+%% What happens to the torque values when the settling time of the equivalent second
+% order systems is chosen very small?
+% KD = [200;200;200];
+% KP = [1500;1500;1500];
+KD = [40;40;40];
+KP = [500;500;500];
+wrongModel = 0;
+% set step response
+sim('simulink_models\joint_space_inv_dyn.slx',1);

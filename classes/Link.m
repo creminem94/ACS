@@ -37,9 +37,12 @@ classdef Link < handle
             c = obj.c_h;
             h = obj.c_h;
             if obj.type == "box"
-                Ic = [1/12*m*(obj.b^2+c^2)
-                      1/12*m*(obj.a^2+c^2)
-                      1/12*m*(obj.a^2+obj.b^2)];
+%                 Ic = [1/12*m*(obj.b^2+c^2)
+%                       1/12*m*(obj.a^2+c^2)
+%                       1/12*m*(obj.a^2+obj.b^2)];
+               Ic = [1/12*m*(obj.b^2+obj.a^2)
+                  1/12*m*(obj.a^2+c^2)
+                  1/12*m*(obj.b^2+c^2)];
             else
                 Ic = [1/2*m*(obj.a^2+obj.b^2)
                       1/2*m*(3*(obj.a^2+obj.b^2)+h^2)
@@ -49,7 +52,8 @@ classdef Link < handle
         end
         
         function It = translatedInertia(obj)
-            r = obj.tvec;
+            T = obj.robot.getTransform(obj.idx);
+            r = -T(1:3,1:3)'*obj.tvec;
             It = obj.inertiaCoM + obj.mass*(r'*r*eye(3)-r*r');
         end
         
@@ -112,7 +116,7 @@ classdef Link < handle
         end
         
         function r = ri_ic_i(obj)
-            r = obj.tvec;
+            r = -obj.tvec;
         end
         
         function l = prevLink(obj)
@@ -185,7 +189,8 @@ classdef Link < handle
         function f = fip1_ip1(obj)
             syms fex fey fez real;
             if obj.idx == obj.robot.N
-                f = sym([fex; fey; fez]);
+%                 f = sym([fex; fey; fez]);
+                f = zeros(3,1);
             else
                 f = obj.nextLink.fi_i;
             end
@@ -194,7 +199,8 @@ classdef Link < handle
         function u = uip1_ip1(obj)
             syms uex uey uez real;
             if obj.idx == obj.robot.N
-                u = sym([uex;uey;uez]);
+%                 u = sym([uex;uey;uez]);
+                u = zeros(3,1);
             else
                 u = obj.nextLink.ui_i;
             end

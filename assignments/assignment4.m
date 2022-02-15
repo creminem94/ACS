@@ -1,3 +1,6 @@
+% Assignemnt 4
+% Compute the RNE formulation
+
 disp('B RNE');
 disp(myRobot.B_RNE);
 disp('C RNE * dq');
