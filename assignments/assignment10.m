@@ -1,10 +1,9 @@
 % Assignment 10
 % Design the Operational Space Inverse Dynamics Control law
 
-KD = [200;40;10;10;10;10];
-KP = [1000;50;50;50;50;50];
+KD = [20;80;20;10;10;10];
+KP = [1000;200;100;50;50;50];
 values_loader;
-g_q = [0;0;-g*m3];
 
 % simulink trajectory
 qi = [0 pi/3 0]';
@@ -15,14 +14,14 @@ dqm = 0.1;
 ddqm = 0.1;
 dddqm = 0.5;
 ti = 0;
-tf = 10;
+tf = 9;
 alpha = 0.4;
 beta = 0.4;
 Ts = 0.001;
 
 xi = getK(qi);
 xf = getK(qf);%[-0.3; 0.55;0.2;0;1.7;0];
-
+clear xd;
 TimeValues = [ti:Ts:tf];
 DimValues = 6;
 
@@ -51,4 +50,4 @@ ddxd.time=TimeValues;
 ddxd.signals.values=DataVelocities';
 ddxd.signals.dimensions=DimValues;
 open('simulink_models\operational_space_inv_dyn.slx');
-sim('simulink_models\operational_space_inv_dyn.slx');
+sim('simulink_models\operational_space_inv_dyn.slx',10);

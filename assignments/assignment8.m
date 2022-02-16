@@ -1,10 +1,15 @@
 % Assignment 8
 % Implement in Simulink the Adaptive Control law for the a 1-DoF link under gravity
 
-KD = 30;
-KP = 100;
-lambda = 10;
-Ktheta = inv(diag([100 100 100]));
+KD = 80;
+lambda = 100;
+Ktheta = inv(diag([10000 100 100]));
+I = 0.3;
+F = 0.1;
+G = 0.5;
+I_est = I-0.01;
+F_est = F-0.01;
+G_est = G-0.01;
 A = 1;
 
 Ts = 0.001;

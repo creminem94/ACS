@@ -1,4 +1,4 @@
-function [sys,x0,str,ts] = c(t,x,u,flag,qi, dqi)
+function [sys,x0,str,ts] = c(t,x,u,flag,qi, dqi, I, F, G)
 switch flag,
 
   %%%%%%%%%%%%%%%%%%
@@ -11,7 +11,7 @@ switch flag,
   % Derivatives %
   %%%%%%%%%%%%%%%
   case 1,
-    sys=mdlDerivatives(t,x,u);
+    sys=mdlDerivatives(t,x,u,I, F, G);
 
   %%%%%%%%%%%
   % Outputs %S
@@ -62,14 +62,11 @@ ts  = [0 0];
 % Return the derivatives for the continuous states.
 %=============================================================================
 %
-function sys=mdlDerivatives(t,x,u)
+function sys=mdlDerivatives(t,x,u, I, F, G)
     N = 1;
     q = x(1:N);
     dq = x(N+1:2*N);
     tau = u;
-    I = 1.5;
-    F = 0.1;
-    G = 0.5;
    
     ddq = (tau-F*dq-G*sin(q))/I;
     

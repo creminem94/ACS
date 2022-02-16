@@ -47,7 +47,7 @@ for i=1:DimValues
     DataVelocities(i, :) = traj.dq;
     DataAccelerations(i, :) = traj.ddq;
 end
-
+clear xd;
 xd.time=TimeValues;
 xd.signals.values=DataPositions';
 xd.signals.dimensions=DimValues;
