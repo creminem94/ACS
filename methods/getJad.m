@@ -6,7 +6,8 @@ angles = tform2eul(Tde, 'ZYZ');
 phi =   angles(1);
 theta = angles(2);
 
-Rd = Td(1:3, 1:3);
+% Rd = Td(1:3, 1:3);
+Rd = eul2rotm(xTilde(4:6)');
 Ta = [
 [1, 0, 0, 0,         0,                   0]
 [0, 1, 0, 0,         0,                   0]
@@ -26,5 +27,6 @@ J = [
 R = [Rd' zeros(3,3)
     zeros(3,3) Rd'];
 Jad = pinv(Ta)*R*J;
+
 end
 

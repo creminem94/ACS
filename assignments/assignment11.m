@@ -1,8 +1,8 @@
 % Assignment 11
 % Study the compliance control.
 
-KD = [10;10;10;10;10;10];
-KP = [100;100;100;100;100;100];
+KD = [1;20;10;10;10;10];
+KP = [400;100;100;100;100;100];
 values_loader;
 g_q = [0;0;-g*m3];
 
