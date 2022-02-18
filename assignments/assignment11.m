@@ -1,6 +1,6 @@
 % Assignment 11
 % Study the compliance control.
-
+% case K << KP
 KD = [1;20;10;10;10;10];
 KP = [400;100;100;100;100;100];
 values_loader;
@@ -20,7 +20,15 @@ xr = xd;
 %the robot must go down and collide with env
 xr(3) = xr(3)+0.05;
 
-K = diag([1 1 100 1 1 1]);
+K = diag([1 1 1 1 1 1]);
 
 open('simulink_models\compliance_control.slx');
+sim('simulink_models\compliance_control.slx');
+
+%% case K >> KP
+K = diag([1 1 10000 1 1 1]);
+sim('simulink_models\compliance_control.slx');
+
+%% case K == KP
+K = diag([1 1 100 1 1 1]);
 sim('simulink_models\compliance_control.slx');

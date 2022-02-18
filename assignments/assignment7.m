@@ -62,6 +62,7 @@ sim('simulink_models\joint_space_inv_dyn.slx');
 % set of stabilized double integrators
 KD = [20;20;20];
 KP = [100;100;100];
+wrongModel = 0;
 sim('simulink_models\joint_space_inv_dyn.slx');
 %%
 % Check the behavior of the control law when the ^B; ^C; ^g used within the controller are
@@ -72,8 +73,6 @@ wrongModel = 1;
 sim('simulink_models\joint_space_inv_dyn.slx');
 %% What happens to the torque values when the settling time of the equivalent second
 % order systems is chosen very small?
-% KD = [200;200;200];
-% KP = [1500;1500;1500];
 KD = [40;40;40];
 KP = [500;500;500];
 wrongModel = 0;

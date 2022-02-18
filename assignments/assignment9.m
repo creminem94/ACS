@@ -15,11 +15,7 @@ tf = 10;
 Ts = 0.001;
 
 xi = getK(qi);
-xf = getK(qf);
-
+xd = getK(qf);
 
 open('simulink_models\operational_space_pd_w_g_comp.slx');
 sim('simulink_models\operational_space_pd_w_g_comp.slx');
-
-%TODO, riguardare lezione 20/12 alla fine per caso singolarità, va aggiunto
-%quindi anche una saturazione (5)

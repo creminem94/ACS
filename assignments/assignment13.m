@@ -1,11 +1,11 @@
 % Assignment 13
 % Implement the admittance control in the operational space.
 
-KD = [200;40;10;10;10;10];
-KP = [1000;50;50;50;50;50];
-Mt = [1 1 1 1 1 1];
-KDt = [5 5 5 5 5 5];
-KPt = [9 9 9 9 9 9];
+KD = [400;50;20;10;10;10];
+KP = [5000;300;50;50;50;50];
+Mt = [0.3 0.2 0.1 1 1 1];
+KDt = [5 50 1 1 1 1];
+KPt = [50 200 10 10 10 10];
 
 values_loader;
 g_q = [0;0;-g*m3];

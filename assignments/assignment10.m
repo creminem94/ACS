@@ -1,8 +1,8 @@
 % Assignment 10
 % Design the Operational Space Inverse Dynamics Control law
 
-KD = [20;80;20;10;10;10];
-KP = [1000;200;100;50;50;50];
+KD = [500;150;20;10;10;10];
+KP = [10000;500;100;50;50;50];
 values_loader;
 
 % simulink trajectory

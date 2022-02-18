@@ -16,16 +16,19 @@ addNoise = 0;
 % simulink trajectory
 qi = [0 0 0]';
 qd = [0.2 pi 0.2]';
-
+dqi = [0 0 0]';
+Ts = 0.001;
 open('simulink_models\joint_space_pd_w_g_comp.slx');
 sim('simulink_models\joint_space_pd_w_g_comp.slx');
 
 %% g(q) not taken into account
+addNoise = 0;
 g_q = zeros(3,1);
 sim('simulink_models\joint_space_pd_w_g_comp.slx');
 
 %% fixed to a wrong value
-g_q = [0;0;-g*m3*1.1];
+addNoise = 0;
+g_q = [0;0;-g*m3*1.5];
 sim('simulink_models\joint_space_pd_w_g_comp.slx');
 
 %% qd not const 

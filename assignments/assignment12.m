@@ -2,8 +2,8 @@
 % Implement the impedance control in the operational space.
 
 KD = [200;40;10;10;10;10];
-KP = [1000;50;50;50;50;50];
-Md = diag([1;1;1;1;1;1]);
+KP = [1000;200;50;50;50;50];
+Md = diag([0.3;0.2;0.1;1;1;1]);
 invMd = inv(Md);
 values_loader;
 g_q = [0;0;-g*m3];
