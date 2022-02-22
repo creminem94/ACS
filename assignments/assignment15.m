@@ -1,21 +1,21 @@
 % Assignment 15
 % Implement the Parallel Force/Position Control
-KD = [200;40;10;10;10;10];
-KP = [1000;50;50;50;50;50];
-Md = diag([1;1;1;1;1;1]);
-KI = 0;
-KF = 10;
+KD = [50;50;20;10;10;10];
+KP = [1000;300;20;50;50;50];
+Md = diag([0.01;0.1;0.1;1;1;1]);
+KI = 4;
+KF = 5;
 
 invMd = inv(Md);
 values_loader;
 g_q = [0;0;-g*m3];
 
-K = diag([0 0 10 0 0 0]);
-
+K = diag([0 0 15 0 0 0]);
+fd = [0 0 -0.5 0 0 0]';
 % simulink trajectory
 qi = [0 0 0]';
 dqi = [0;0;0];
-qf = [0 0 -0.1]';
+qf = [0.2 pi/2 -0.1]';
 dqf = 0;
 dqm = 0.1;
 ddqm = 0.1;
@@ -27,39 +27,15 @@ beta = 0.4;
 Ts = 0.001;
 
 xi = getK(qi);
-xf = getK(qf);
+xd = getK(qf);
 
-xr = xf;
+xr = xd;
 %env is orthogonal to z direction and a little above to desired position
 %the robot must go down and collide with env
 xr(3) = xr(3)+0.05;
 
-TimeValues = [ti:Ts:tf];
-DimValues = 6;
-
-DataPositions = [];
-DataVelocities = [];
-DataAccelerations = [];
-
-for i=1:DimValues
-    fprintf("\nEvaluating qi=%f,qf=%f\n",xi(i),xf(i));
-    traj = doubleStrajectory(xi(i),xf(i),0,0,dqm,ddqm,dddqm,ti,tf,alpha,beta,Ts);
-
-    DataPositions(i, :) = traj.q;
-    DataVelocities(i, :) = traj.dq;
-    DataAccelerations(i, :) = traj.ddq;
-end
-
-xd.time=TimeValues;
-xd.signals.values=DataPositions';
-xd.signals.dimensions=DimValues;
-
-dxd.time=TimeValues;
-dxd.signals.values=DataVelocities';
-dxd.signals.dimensions=DimValues;
-
-ddxd.time=TimeValues;
-ddxd.signals.values=DataVelocities';
-ddxd.signals.dimensions=DimValues;
 open('simulink_models\parallel_force_pos_control.slx');
+sim('simulink_models\parallel_force_pos_control.slx');
+%%
+KI = 0;
 sim('simulink_models\parallel_force_pos_control.slx');

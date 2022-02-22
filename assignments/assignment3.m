@@ -4,7 +4,7 @@
 disp('B');
 disp(myRobot.B);
 disp('C');
-disp(myRobot.C);
+disp(myRobot.C*myRobot.dq);
 disp('G');
 disp(myRobot.G);
 disp('TAU');
@@ -15,7 +15,7 @@ disp('Set configuration [0.1;pi/3;-0.1] to see some values');
 disp('B');
 disp(myRobot.setValues(myRobot.B, false, true));
 disp('C');
-disp(myRobot.setValues(myRobot.C, false, true));
+disp(myRobot.setValues(myRobot.C*myRobot.dq, false, true));
 disp('G');
 disp(myRobot.setValues(myRobot.G, false, true));
 disp('TAU');
