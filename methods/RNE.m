@@ -17,7 +17,7 @@ function tau = RNE(myRobot,q,dq,ddq,g0)
         T = innerT(:,:, i);
         R = T(1:3,1:3);
         r = T(1:3, 4);
-        rc = -links(i-1).tvec;
+        rc = links(i-1).tvec;
         w(:,i) = R'*w(:,i-1);
         dw(:,i) = R'*dw(:,i-1);
         if links(i-1).type == "cyl"
@@ -44,7 +44,7 @@ function tau = RNE(myRobot,q,dq,ddq,g0)
         Rm1 = Tm1(1:3,1:3);
         r = Tm1(1:3, 4);
         I = links(i).translatedInertia;
-        rc = -links(i).tvec;
+        rc = links(i).tvec;
         m = links(i).mass;
         j = i+1; %index for previously saved
         f(:,i) = R*f(:,i+1)+m*ddpc(:,j);

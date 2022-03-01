@@ -1,7 +1,5 @@
 % Assignemnt 4
 % Compute the RNE formulation
-
-
 zero = zeros(3,1);
 syms g real;
 g0 = [0;-g;0];
