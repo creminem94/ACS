@@ -21,6 +21,3 @@ myRobot = MyRobot('PRP.urdf', DH, links);
 % for visual simulation it needs a variable
 rbt = importrobot('PRP.urdf');
 
-%% todo
-%verificare derivata jacobiana rispetto al tempo, moltiplicare per dq
-
