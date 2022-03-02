@@ -14,3 +14,6 @@ Some useful methods have been defined in MyRobot class:
 - `setSingleConfig` to change the value of a joint
 - `setAllConfig` to set all joint values
 - `setValues`. This one is used to solve the symbolic variable passed as param. It will replace all symbolic variables like masses, length links and so on.
+
+### Report
+The report can be found at https://www.overleaf.com/read/pbhdtdkxhcnv
